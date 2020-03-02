@@ -22,11 +22,11 @@ date: 2018-12-12 15:16:00
 
 >然后可以直接去那个文件下,打开进行编辑，网上有很多这些markdown编辑器，如小书匠等等(支持在线)，我使用sublime Text的。基本截图如下：
 
-![img](https://ws1.sinaimg.cn/large/006bO2RVly1fywxni4lt1j30g30agabc.jpg)
+![img](http://qnpic.top/hexo3%5C1.jpg)
 
-![img](https://ws1.sinaimg.cn/large/006bO2RVly1fywxnibk10j311j0eggp4.jpg)
+![img](http://qnpic.top/hexo3%5C2.jpg)
 
-![img](https://ws1.sinaimg.cn/large/006bO2RVly1fywxnig7skj31h70btmyb.jpg)
+![img](http://qnpic.top/hexo3%5C3.jpg)
 
 >emmmm,至于如何写markdown格式的文章，emmmm，网上应该有相关的教程，我就不献丑，可以参看这几篇[博客](https://www.jianshu.com/p/191d1e21f7ed)
 
@@ -47,9 +47,80 @@ npm install --save hexo-admin
 hexo s -d
 ```
 
-![img](https://ws1.sinaimg.cn/large/006bO2RVly1fywxniix4nj31ha0jmtbk.jpg)
+![img](http://qnpic.top/hexo3%5C4.jpg)
 
-![img](https://ws1.sinaimg.cn/large/006bO2RVly1fywxnin23zj31g30oognu.jpg)
+![img](http://qnpic.top/hexo3%5C5.jpg)
+
+
+## 5.添加阅读统计
+
+>给每条博客添加阅读统计，效果图如下
+
+![img](http://qnpic.top/hexo3%5C6.jpg)
+
+>1.先进入[leancloud官网](https://leancloud.cn/),自行进行注册和登录，然后创建应用
+
+![img](http://qnpic.top/hexo3%5C7.jpg)
+
+>2.进入设置界面
+
+![img](http://qnpic.top/hexo3%5C8.jpg)
+
+>3.应用key,后面要设置的
+
+![img](http://qnpic.top/hexo3%5C9.jpg)
+
+>4.将App ID、App Key 配置到`next/_config.yml`中`leancloud_visitors`
+
+```
+leancloud_visitors:
+  enable: true 设置为true 默认为false
+  app_id:  #你的App ID，注意冒号后面空格
+  app_key:  #你的App Key，注意冒号后面空格
+  Dependencies:  https://github.com/theme-next/hexo-leancloud-counter-security #设置依赖
+  security: true #如果您不关心lc计数器中的安全性并且只想直接使用它（没有hexo-leancloud-counter-security插件），请将`security`设置为`false`。
+  betterPerformance: true #更好的性能
+```
+
+>5.在leancloud存储的位置创建Class,必须命名为`Counter`
+
+![img](http://qnpic.top/hexo3%5C10.jpg)
+
+* 注：这里主要是创建时需要注意的命名`Counter`,还有在`next/config.yml`中的`leancloud_visitors`配置。
+
+## 添加评论
+
+>我们来进行一下文章添加评论系统吧。来设置一些常用的评论系统，我的博客选择的是[Valine](https://leancloud.cn),也是上面的那个网站。重新创建一个应用。前三步骤是一样的，创建的appid和appkey要进入`next/_config.yml`配置
+
+```
+valine:
+  enable: true # 设置为true，默认为false
+  appid:  # 将应用key的App ID设置在这里
+  appkey: # 将应用key的App Key设置在这里
+  notify: true# 邮箱通知 , https://github.com/xCss/Valine/wiki，默认为false
+  verify: true# 验证码 默认为false
+  placeholder: Just go go ^_^ # 初始化评论显示，根据自己修改，这里默认，
+  avatar: wavatar # 头像风格，默认为mm，可进入网址：https://valine.js.org/visitor.html查看头像设置，这里有许多头像风格，进行设置
+  guest_info: nick,mail,link # 自定义评论标题
+  pageSize: 10 # 分页大小，10页就自动分页
+  visitor: true # 是否允许游客评论 ，进入官网查看设置：https://valine.js.org/visitor.html
+```
+
+>效果图
+
+![img](http://qnpic.top/hexo3%5C11.jpg)
+
+这样就完成了valine评论的配置了，接下来就可以进行评论了，我们还可以在后台查看评论信息。
+
+>在valine后台，存储位置中的数据里面创建Class，名称必须为命名为`Comment`
+
+![img](http://qnpic.top/hexo3%5C12.jpg)
+
+![img](http://qnpic.top/hexo3%5C13.jpg)
+
+>至此评论就配置完毕了,gif效果图如下
+
+![img](http://qnpic.top/hexo3%5CGIF.gif)
 
 <br><br><br>
 以上就是本篇博客的全部内容了，祝你写博客愉快，So

@@ -1,8 +1,11 @@
-title: LightBlog Django博客上线
+title: LightBlog-Django博客上线
 author: Light Fish
-top: true
-date: 2019-04-13 23:39:50
 tags:
+  - Django
+categories:
+  - Django
+top: true
+date: 2019-05-22 21:44:30
 ---
 # LightBlog 博客
 
@@ -99,6 +102,7 @@ $('.comment-btn').on('click',function(){
 ```
 
 >其实这件那一大串js代码只是构造评论标签，好动态加载上去，中间几个函数你可以不用管，你主要的是知道这前后端结合的工作流程~~~(别问，问我也没法告诉你,我不会告诉你aboutme 有点联系方式)
+
 
 >流程也是蛮简单的，签单单击发送，触发js函数，向后端发送请求和数据，后端接收，然后进行验证和数据库的操作，然后向前端发送response，前端接收和进行响应。是不是很简单呀~~
 
@@ -429,63 +433,63 @@ def comment_reply(request):
 
 ```
 <script type="text/javascript">
-	layui.use(['layer','flow','element'],function(){
-		var layer = layui.layer;
-		var flow = layui.flow;
-		var element = layui.element;
+    layui.use(['layer','flow','element'],function(){
+        var layer = layui.layer;
+        var flow = layui.flow;
+        var element = layui.element;
 
-		flow.load({
-			elem: "#flow_myself",
-			is_Auto:true,
-			end: "emm,nothing next",
-			is_Lazyimg: true,
-			done: function(page,next){
-				var lis = '';
-				$.get('/account/article_page/{{user.username}}?page='+page, function(e){
-				    parse_res = JSON.parse(e)
+        flow.load({
+            elem: "#flow_myself",
+            is_Auto:true,
+            end: "emm,nothing next",
+            is_Lazyimg: true,
+            done: function(page,next){
+                var lis = '';
+                $.get('/account/article_page/{{user.username}}?page='+page, function(e){
+                    parse_res = JSON.parse(e)
                     res = parse_res.data
                     page_num = parse_res.page_num
                     console.log(res)
-				    for(var i = 0; i < res.length; i++){
+                    for(var i = 0; i < res.length; i++){
 
                         var item = '<!-- 此处省略动态加载html代码 -->'
 
                         lis+=item;
 
-				    }
-				    next(lis,page<page_num)
-				})
+                    }
+                    next(lis,page<page_num)
+                })
 
 
-			}
-		})
+            }
+        })
 
-		flow.load({
-			elem: "#flow_article",
-			is_Auto:true,
-			end: "emm,nothing next",
-			is_Lazyimg: true,
-			done: function(page,next){
-				var lis = '';
-				$.get('/account/article_like/{{ user.username }}?page='+page, function(e){
-				    parse_res = JSON.parse(e)
+        flow.load({
+            elem: "#flow_article",
+            is_Auto:true,
+            end: "emm,nothing next",
+            is_Lazyimg: true,
+            done: function(page,next){
+                var lis = '';
+                $.get('/account/article_like/{{ user.username }}?page='+page, function(e){
+                    parse_res = JSON.parse(e)
                     res = parse_res.data
                     page_num = parse_res.page_num
                     console.log(res)
-				    for(var i = 0; i < res.length; i++){
+                    for(var i = 0; i < res.length; i++){
 
                         var item = '<!-- 此处省略动态加载html代码 -->'
 
                         lis+=item;
 
-				    }
-				    next(lis,page<page_num)
-				})
+                    }
+                    next(lis,page<page_num)
+                })
 
 
-			}
-		})
-	})
+            }
+        })
+    })
 </script>
 ```
 
@@ -524,5 +528,71 @@ def article_like(request, username):
 >下面就是简单的实现图
 
 ![img](http://qnpic.top/information1.gif)
+
+## 发布时间的优化
+
+>效果图如下
+
+![img](http://qnpic.top/single/1.jpg)
+
+>实现就很简单了，js代码如下,后端返回数据时间戳，前端接收时间戳并进行转化，这里也是我后端转化为时间戳遇到的问题，数据库里是datetime类型，你就需要使用`time.mktime(datetime.timetuple())`,这里的`datetime`就是要转换时间类型
+
+```
+var Time = {
+    // 获取当前时间戳
+    getUnix: function(){
+        var date = new Date();
+        return date.getTime();
+    },
+    // 获取今天0：0的时间戳
+    getTodayUnix: function(){
+        var date = new Date();
+        date.setHours(0);
+        date.setMilliseconds(0);
+        date.setMinutes(0);
+        date.setSeconds(0);
+        return date.getTime();
+    },
+    // 获取今年的1月1号0时0分的时间戳
+    getYearUnix: function(){
+        var date = new Date();
+        date.setHours(0);
+        date.setMilliseconds(0);
+        date.setMinutes(0);
+        date.setSeconds(0);
+        date.setMonth(0);
+        date.setDate(1);
+        return date.getTime();
+    },
+    //获取标准年月日
+    getLastDate: function(timestamp){
+        var date = new Date(timestamp);
+        var month = date.getMonth() + 1<10?'0'+(date.getMonth() + 1):date.getMonth() + 1;
+        var day = date.getDate() <10?'0'+date.getDate():date.getDate();
+        return date.getFullYear() + "-"+month+"-"+day;
+    },
+    //转换时间
+    getFormatTime: function(time){
+        var timestamp = time * 1000;
+        var now = this.getUnix();
+        var today = this.getTodayUnix();
+        var year = this.getYearUnix();
+        var timer = (now-timestamp)/1000;
+        var tips = '';
+        if(Math.floor(timer)<60){
+            tips = '刚刚';
+        }else if(timer<3600){
+            tips = Math.floor(timer/60)+'分钟前';
+        }else if(timer>=3600 && (timestamp-today>=0)){
+            tips = Math.floor(timer/3600)+'小时前';
+        }else if(timer/86400<=31){
+            tips = Math.ceil(timer/86400)+'天前';
+        }else{
+            tips = this.getLastDate(timestamp);
+        }
+        return tips;
+    }
+}
+```
 
 <br><br><br>其实主要还是redis相应的函数需要理解，So<br><br>Just have fun..
